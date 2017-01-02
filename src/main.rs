@@ -1,3 +1,9 @@
+//
+// main.rs
+// Copyright (C) 2017 Szymon Urbaś <szymon.urbas@aol.com>
+// Distributed under terms of the BSD (2-clause) license.
+//
+
 extern crate getopts;
 extern crate itertools;
 
@@ -6,6 +12,7 @@ use std::env;
 use std::io::{self, Write, BufRead};
 
 mod lexer;
+mod parser;
 
 fn print_usage(program: &str, opts: Options)
 {
@@ -44,8 +51,10 @@ fn main() {
     }
 
     let tokens = lexer::tokenize(&input);
-
     println!("your tokenized input: {:?}", tokens);
+
+    let ast = parser::parse(&tokens);
+    println!("the AST made from the tokens: {:?}", ast);
 
     input.clear();
   }
