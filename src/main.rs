@@ -13,6 +13,7 @@ use std::io::{self, Write, BufRead};
 
 mod lexer;
 mod parser;
+mod executor;
 
 fn print_usage(program: &str, opts: Options)
 {
@@ -55,6 +56,9 @@ fn main() {
 
     let ast = parser::parse(&tokens);
     println!("the AST made from the tokens: {:?}", ast);
+
+    let result = executor::execute(&ast.ok().unwrap());
+    println!("the actual result: {:?}", result);
 
     input.clear();
   }

@@ -56,7 +56,6 @@ fn expr(mut tokens: &mut Peekable<Iter<Token>>) -> Option<Expr> {
 
   let op = tokens.next().unwrap();
   let rhs = expr(&mut tokens);
-  println!("rhs: {:?}", rhs);
 
   if rhs.is_none() {
     return None;
