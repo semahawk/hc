@@ -1,7 +1,11 @@
 extern crate getopts;
+extern crate itertools;
+
 use getopts::Options;
 use std::env;
 use std::io::{self, Write, BufRead};
+
+mod lexer;
 
 fn print_usage(program: &str, opts: Options)
 {
@@ -39,7 +43,9 @@ fn main() {
       Ok(_) => (),
     }
 
-    println!("your input: {}", input);
+    let tokens = lexer::tokenize(&input);
+
+    println!("your tokenized input: {:?}", tokens);
 
     input.clear();
   }
