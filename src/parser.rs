@@ -12,6 +12,8 @@ use std::iter::Peekable;
 pub enum Expr {
   Add(Box<Expr>, Box<Expr>),
   Sub(Box<Expr>, Box<Expr>),
+  Mul(Box<Expr>, Box<Expr>),
+  Div(Box<Expr>, Box<Expr>),
   Number(u32),
 }
 
@@ -38,8 +40,44 @@ fn primary(tokens: &mut Peekable<Iter<Token>>) -> Option<Expr> {
   }
 }
 
-fn add(mut tokens: &mut Peekable<Iter<Token>>) -> Option<Expr> {
+fn mul(mut tokens: &mut Peekable<Iter<Token>>) -> Option<Expr> {
   let lhs = primary(&mut tokens);
+
+  if lhs.is_none() {
+    return None;
+  }
+
+  if let Some(op) = tokens.peek() {
+    match op {
+      &&Token::Star | &&Token::Slash => (),
+      _ => return lhs,
+    }
+  } else {
+    return lhs;
+  }
+
+  let op = tokens.next().unwrap();
+  let rhs = expr(&mut tokens);
+
+  if rhs.is_none() {
+    return None;
+  }
+
+  match op {
+    &Token::Star => {
+      Some(Expr::Mul(Box::new(lhs.unwrap()), Box::new(rhs.unwrap())))
+    },
+    &Token::Slash => {
+      Some(Expr::Div(Box::new(lhs.unwrap()), Box::new(rhs.unwrap())))
+    },
+    _ => {
+      None
+    },
+  }
+}
+
+fn add(mut tokens: &mut Peekable<Iter<Token>>) -> Option<Expr> {
+  let lhs = mul(&mut tokens);
 
   if lhs.is_none() {
     return None;

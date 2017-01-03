@@ -36,6 +36,30 @@ pub fn execute(expr: &Expr) -> Result<Value, &'static str> {
         }
       }
     },
+    &Expr::Mul(ref l, ref r) => {
+      let lhs = execute(&*l).ok().unwrap();
+      let rhs = execute(&*r).ok().unwrap();
+
+      match (lhs, rhs) {
+        (Value::Number(lhs), Value::Number(rhs)) => {
+          Ok(Value::Number(lhs * rhs))
+        }
+      }
+    },
+    &Expr::Div(ref l, ref r) => {
+      let lhs = execute(&*l).ok().unwrap();
+      let rhs = execute(&*r).ok().unwrap();
+
+      match (lhs, rhs) {
+        (Value::Number(lhs), Value::Number(rhs)) => {
+          if rhs == 0 {
+            return Err("Division by zero!");
+          }
+
+          Ok(Value::Number(lhs / rhs))
+        }
+      }
+    },
   }
 }
 
