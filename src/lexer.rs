@@ -19,7 +19,7 @@ pub enum Token {
 pub fn tokenize(input: &str) -> Vec<Token> {
   let mut tokens = Vec::new();
 
-  let mut iter = input.chars();
+  let mut iter = input.chars().peekable();
 
   while let Some(c) = iter.next() {
     if c.is_whitespace() {
@@ -27,11 +27,24 @@ pub fn tokenize(input: &str) -> Vec<Token> {
     }
 
     if c.is_numeric() {
-      let mut value = c.to_digit(10).unwrap();
+      let mut base = 10;
 
-      while let Some(p) = iter.take_while_ref(|x| x.is_numeric()).next() {
-        value *= 10;
-        value += p.to_digit(10).unwrap();
+      if c == '0' {
+        match iter.peek() {
+          Some(&'x') => { iter.next(); base = 16 },
+          Some(&'c') => { iter.next(); base =  8 },
+          Some(&'q') => { iter.next(); base =  4 },
+          Some(&'b') => { iter.next(); base =  2 },
+          Some(&_) =>   { iter.next(); base = 10 },
+          None => (),
+        }
+      }
+
+      let mut value = c.to_digit(base).unwrap();
+
+      while let Some(p) = iter.take_while_ref(|x| x.is_alphanumeric()).next() {
+        value *= base;
+        value += p.to_digit(base).unwrap();
       }
 
       tokens.push(Token::Integer(value));
