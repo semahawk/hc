@@ -38,7 +38,7 @@ fn primary(tokens: &mut Peekable<Iter<Token>>) -> Option<Expr> {
   }
 }
 
-fn expr(mut tokens: &mut Peekable<Iter<Token>>) -> Option<Expr> {
+fn add(mut tokens: &mut Peekable<Iter<Token>>) -> Option<Expr> {
   let lhs = primary(&mut tokens);
 
   if lhs.is_none() {
@@ -71,6 +71,13 @@ fn expr(mut tokens: &mut Peekable<Iter<Token>>) -> Option<Expr> {
     _ => {
       None
     },
+  }
+}
+
+fn expr(mut tokens: &mut Peekable<Iter<Token>>) -> Option<Expr> {
+  match add(&mut tokens) {
+    Some(expr) => Some(expr),
+    None => None,
   }
 }
 
