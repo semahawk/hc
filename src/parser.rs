@@ -7,6 +7,7 @@
 use lexer::*;
 use std::slice::Iter;
 use std::iter::Peekable;
+use itertools::Itertools;
 
 #[derive(Debug)]
 pub enum Expr {
@@ -41,75 +42,63 @@ fn primary(tokens: &mut Peekable<Iter<Token>>) -> Option<Expr> {
 }
 
 fn mul(mut tokens: &mut Peekable<Iter<Token>>) -> Option<Expr> {
-  let lhs = primary(&mut tokens);
+  let mut lhs = primary(&mut tokens);
 
   if lhs.is_none() {
     return None;
   }
 
-  if let Some(op) = tokens.peek() {
-    match op {
-      &&Token::Star | &&Token::Slash => (),
-      _ => return lhs,
+  while let Some(op) = tokens.peeking_take_while(|t| match t { &&Token::Star => true, &&Token::Slash => true, _ => false }).next() {
+    let rhs = primary(&mut tokens);
+
+    if rhs.is_none() {
+      return None;
     }
-  } else {
-    return lhs;
-  }
 
-  let op = tokens.next().unwrap();
-  let rhs = expr(&mut tokens);
+    lhs = match op {
+      &Token::Star => {
+        Some(Expr::Mul(Box::new(lhs.unwrap()), Box::new(rhs.unwrap())))
+      },
+      &Token::Slash => {
+        Some(Expr::Div(Box::new(lhs.unwrap()), Box::new(rhs.unwrap())))
+      },
+      _ => {
+        None
+      },
+    };
+  };
 
-  if rhs.is_none() {
-    return None;
-  }
-
-  match op {
-    &Token::Star => {
-      Some(Expr::Mul(Box::new(lhs.unwrap()), Box::new(rhs.unwrap())))
-    },
-    &Token::Slash => {
-      Some(Expr::Div(Box::new(lhs.unwrap()), Box::new(rhs.unwrap())))
-    },
-    _ => {
-      None
-    },
-  }
+  lhs
 }
 
 fn add(mut tokens: &mut Peekable<Iter<Token>>) -> Option<Expr> {
-  let lhs = mul(&mut tokens);
+  let mut lhs = mul(&mut tokens);
 
   if lhs.is_none() {
     return None;
   }
 
-  if let Some(op) = tokens.peek() {
-    match op {
-      &&Token::Plus | &&Token::Minus => (),
-      _ => return lhs,
+  while let Some(op) = tokens.peeking_take_while(|t| match t { &&Token::Plus => true, &&Token::Minus => true, _ => false }).next() {
+    let rhs = mul(&mut tokens);
+
+    if rhs.is_none() {
+      return None;
     }
-  } else {
-    return lhs;
-  }
 
-  let op = tokens.next().unwrap();
-  let rhs = expr(&mut tokens);
+    lhs = match op {
+      &Token::Plus => {
+        Some(Expr::Add(Box::new(lhs.unwrap()), Box::new(rhs.unwrap())))
+      },
+      &Token::Minus => {
+        Some(Expr::Sub(Box::new(lhs.unwrap()), Box::new(rhs.unwrap())))
+      },
+      _ => {
+        None
+      },
+    };
+  };
 
-  if rhs.is_none() {
-    return None;
-  }
-
-  match op {
-    &Token::Plus => {
-      Some(Expr::Add(Box::new(lhs.unwrap()), Box::new(rhs.unwrap())))
-    },
-    &Token::Minus => {
-      Some(Expr::Sub(Box::new(lhs.unwrap()), Box::new(rhs.unwrap())))
-    },
-    _ => {
-      None
-    },
-  }
+  lhs
 }
 
 fn expr(mut tokens: &mut Peekable<Iter<Token>>) -> Option<Expr> {
