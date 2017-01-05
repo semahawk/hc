@@ -15,6 +15,8 @@ pub enum Expr {
   Sub(Box<Expr>, Box<Expr>),
   Mul(Box<Expr>, Box<Expr>),
   Div(Box<Expr>, Box<Expr>),
+  Assign(Box<Expr>, Box<Expr>),
+  Ident(String),
   Number(u32),
 }
 
@@ -36,7 +38,7 @@ fn primary(tokens: &mut Peekable<Iter<Token>>) -> Option<Expr> {
 
   match token {
     &Token::Integer(i) => Some(Expr::Number(i)),
-    &Token::Ident(_) => Some(Expr::Number(1337)),
+    &Token::Ident(ref i) => Some(Expr::Ident(i.clone())),
     _ => None,
   }
 }
@@ -101,8 +103,35 @@ fn add(mut tokens: &mut Peekable<Iter<Token>>) -> Option<Expr> {
   lhs
 }
 
+fn assign(mut tokens: &mut Peekable<Iter<Token>>) -> Option<Expr> {
+  let mut lhs = add(&mut tokens);
+
+  if lhs.is_none() {
+    return None;
+  }
+
+  while let Some(op) = tokens.peeking_take_while(|t| match t { &&Token::Eq => true, _ => false }).next() {
+    let rhs = add(&mut tokens);
+
+    if rhs.is_none() {
+      return None;
+    }
+
+    lhs = match op {
+      &Token::Eq => {
+        Some(Expr::Assign(Box::new(lhs.unwrap()), Box::new(rhs.unwrap())))
+      },
+      _ => {
+        None
+      },
+    };
+  };
+
+  lhs
+}
+
 fn expr(mut tokens: &mut Peekable<Iter<Token>>) -> Option<Expr> {
-  match add(&mut tokens) {
+  match assign(&mut tokens) {
     Some(expr) => Some(expr),
     None => None,
   }

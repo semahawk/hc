@@ -53,6 +53,11 @@ pub fn execute(expr: &Expr) -> Result<Value, &'static str> {
     &Expr::Number(i) => {
       Ok(Value::Number(i))
     },
+    &Expr::Ident(ref i) => {
+      println!("TODO: lookup the value of variable '{}'", i);
+
+      Ok(Value::Number(132))
+    },
     &Expr::Add(ref l, ref r) => {
       let lhs = execute(&*l).ok().unwrap();
       let rhs = execute(&*r).ok().unwrap();
@@ -94,6 +99,22 @@ pub fn execute(expr: &Expr) -> Result<Value, &'static str> {
           }
 
           Ok(Value::Number(lhs / rhs))
+        }
+      }
+    },
+    &Expr::Assign(ref l, ref r) => {
+      let rhs = execute(&*r).ok().unwrap();
+      let ref lhs = **l;
+
+      let varname = match lhs {
+        &Expr::Ident(ref varname) => varname.clone(),
+        _ => return Err("Can only assign to an identifier!"),
+      };
+
+      match rhs {
+        Value::Number(rhs) => {
+          println!("TODO: actually store the value in '{}'", varname);
+          Ok(Value::Number(rhs))
         }
       }
     },

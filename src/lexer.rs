@@ -14,6 +14,7 @@ pub enum Token {
   Minus,
   Star,
   Slash,
+  Eq,
 }
 
 pub fn tokenize(input: &str) -> Vec<Token> {
@@ -68,6 +69,7 @@ pub fn tokenize(input: &str) -> Vec<Token> {
       '-' => tokens.push(Token::Minus),
       '*' => tokens.push(Token::Star),
       '/' => tokens.push(Token::Slash),
+      '=' => tokens.push(Token::Eq),
       _ => (),
     }
   }
