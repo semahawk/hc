@@ -4,11 +4,48 @@
 // Distributed under terms of the BSD (2-clause) license.
 //
 
+use std::fmt;
 use parser::*;
 
 #[derive(Debug)]
 pub enum Value {
   Number(u32),
+}
+
+impl fmt::Display for Value {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+
+    match self {
+      &Value::Number(n) => write!(f, "{}", n),
+    }
+  }
+}
+
+impl fmt::Binary for Value {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+
+    match self {
+      &Value::Number(n) => write!(f, "{:b}", n),
+    }
+  }
+}
+
+impl fmt::Octal for Value {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+
+    match self {
+      &Value::Number(n) => write!(f, "{:o}", n),
+    }
+  }
+}
+
+impl fmt::LowerHex for Value {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+
+    match self {
+      &Value::Number(n) => write!(f, "{:x}", n),
+    }
+  }
 }
 
 pub fn execute(expr: &Expr) -> Result<Value, &'static str> {

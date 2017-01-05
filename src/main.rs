@@ -60,6 +60,15 @@ fn main() {
     let result = executor::execute(&ast.ok().unwrap());
     println!("the actual result: {:?}", result);
 
+    match result {
+      Ok(result) => {
+        println!("res = {} (hex: {:x} oct: {:o} bin: {:b})", result, result, result, result);
+      },
+      Err(err) => {
+        println!("error: {}", err);
+      }
+    }
+
     input.clear();
   }
 }
