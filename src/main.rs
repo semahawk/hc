@@ -64,10 +64,14 @@ fn main() {
 
     println!("your tokenized input: {:?}", tokens);
 
-    let ast = parser::parse(&tokens);
+    let ast = match parser::parse(&tokens) {
+      Ok(ast) => ast,
+      Err(err) => { println!("error: {}", err); continue },
+    };
+
     println!("the AST made from the tokens: {:?}", ast);
 
-    let result = executor::execute(&mut ctx, &ast.ok().unwrap());
+    let result = executor::execute(&mut ctx, &ast);
     println!("the actual result: {:?}", result);
 
     match result {
