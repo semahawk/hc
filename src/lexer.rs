@@ -15,6 +15,9 @@ pub enum Token {
   Star,
   Slash,
   Eq,
+  And,
+  Pipe,
+  Caret,
 }
 
 pub fn tokenize(input: &str) -> Result<Vec<Token>, String> {
@@ -70,6 +73,9 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, String> {
       '*' => tokens.push(Token::Star),
       '/' => tokens.push(Token::Slash),
       '=' => tokens.push(Token::Eq),
+      '&' => tokens.push(Token::And),
+      '|' => tokens.push(Token::Pipe),
+      '^' => tokens.push(Token::Caret),
       ch  => return Err(format!("Unknown character '{}'", ch)),
     }
   }
