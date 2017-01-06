@@ -83,33 +83,7 @@ fn primary(tokens: &mut Peekable<Iter<Token>>) -> Option<Expr> {
 
 generate_binop!(primary before mul, Star -> Mul, Slash -> Div);
 generate_binop!(mul before add, Plus -> Add, Minus -> Sub);
-
-fn assign(mut tokens: &mut Peekable<Iter<Token>>) -> Option<Expr> {
-  let mut lhs = add(&mut tokens);
-
-  if lhs.is_none() {
-    return None;
-  }
-
-  while let Some(op) = tokens.peeking_take_while(|t| match t { &&Token::Eq => true, _ => false }).next() {
-    let rhs = add(&mut tokens);
-
-    if rhs.is_none() {
-      return None;
-    }
-
-    lhs = match op {
-      &Token::Eq => {
-        Some(Expr::Assign(Box::new(lhs.unwrap()), Box::new(rhs.unwrap())))
-      },
-      _ => {
-        None
-      },
-    };
-  };
-
-  lhs
-}
+generate_binop!(add before assign, Eq -> Assign);
 
 fn expr(mut tokens: &mut Peekable<Iter<Token>>) -> Option<Expr> {
   match assign(&mut tokens) {
