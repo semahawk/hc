@@ -45,6 +45,7 @@ fn main() {
   let stdio = io::stdin();
   let mut input = String::new();
 
+  let mut current_result = 0i64;
   let mut ctx = context::Context::new();
 
   loop {
@@ -67,7 +68,10 @@ fn main() {
 
     match result {
       Ok(result) => {
-        println!("res = {} (hex: {:x} oct: {:o} bin: {:b})", result, result, result, result);
+        let res_name = format!("res{}", current_result);
+        println!("{} = {} (hex: {:x} oct: {:o} bin: {:b})", res_name, result, result, result, result);
+        ctx.add_variable(res_name, result);
+        current_result += 1;
       },
       Err(err) => {
         println!("error: {}", err);
