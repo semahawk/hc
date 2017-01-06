@@ -62,19 +62,12 @@ fn main() {
       Err(err) => { println!("error: {}", err); continue },
     };
 
-    println!("your tokenized input: {:?}", tokens);
-
     let ast = match parser::parse(&tokens) {
       Ok(ast) => ast,
       Err(err) => { println!("error: {}", err); continue },
     };
 
-    println!("the AST made from the tokens: {:?}", ast);
-
-    let result = executor::execute(&mut ctx, &ast);
-    println!("the actual result: {:?}", result);
-
-    match result {
+    match executor::execute(&mut ctx, &ast) {
       Ok(result) => {
         let res_name = format!("res{}", current_result);
         println!("{} = {} (hex: {:x} oct: {:o} bin: {:b})", res_name, result, result, result, result);
