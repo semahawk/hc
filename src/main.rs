@@ -53,18 +53,30 @@ fn main() {
     io::stdout().flush().ok().expect("Could not flush stdout");
 
     match stdio.lock().read_line(&mut input) {
-      Err(err) => println!("# error: {}", err),
+      Err(err) => {
+        println!("# error: {}", err);
+        input.clear();
+        continue
+      },
       Ok(_) => (),
     }
 
     let tokens = match lexer::tokenize(&input) {
       Ok(tokens) => tokens,
-      Err(err) => { println!("error: {}", err); continue },
+      Err(err) => {
+        println!("error: {}", err);
+        input.clear();
+        continue
+      },
     };
 
     let ast = match parser::parse(&tokens) {
       Ok(ast) => ast,
-      Err(err) => { println!("error: {}", err); continue },
+      Err(err) => {
+        println!("error: {}", err);
+        input.clear();
+        continue
+      },
     };
 
     match executor::execute(&mut ctx, &ast) {
