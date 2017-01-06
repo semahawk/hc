@@ -21,7 +21,7 @@ pub enum Expr {
 }
 
 macro_rules! generate_binop {
-  ($high_fname:ident before $func_name:ident, $op1:ident -> $expr1:ident, $op2:ident -> $expr2:ident) => (
+  ($high_fname:ident before $func_name:ident, $($op:ident -> $expr:ident),+) => (
     fn $func_name(mut tokens: &mut Peekable<Iter<Token>>) -> Option<Expr> {
       let mut lhs = $high_fname(&mut tokens);
 
@@ -29,7 +29,12 @@ macro_rules! generate_binop {
         return None;
       }
 
-      while let Some(op) = tokens.peeking_take_while(|t| match t { &&Token::$op1 => true, &&Token::$op2 => true, _ => false }).next() {
+      while let Some(op) = tokens.peeking_take_while(|t| match t {
+        $(
+          &&Token::$op => true,
+        )+
+        _ => false
+      }).next() {
         let rhs = $high_fname(&mut tokens);
 
         if rhs.is_none() {
@@ -37,12 +42,11 @@ macro_rules! generate_binop {
         }
 
         lhs = match op {
-          &Token::$op1 => {
-            Some(Expr::$expr1(Box::new(lhs.unwrap()), Box::new(rhs.unwrap())))
-          },
-          &Token::$op2 => {
-            Some(Expr::$expr2(Box::new(lhs.unwrap()), Box::new(rhs.unwrap())))
-          },
+          $(
+            &Token::$op => {
+              Some(Expr::$expr(Box::new(lhs.unwrap()), Box::new(rhs.unwrap())))
+            },
+          )+
           _ => {
             None
           },
