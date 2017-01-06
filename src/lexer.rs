@@ -8,7 +8,7 @@ use itertools::Itertools;
 
 #[derive(Debug, PartialEq)]
 pub enum Token {
-  Integer(u32),
+  Integer(i64),
   Ident(String),
   Plus,
   Minus,
@@ -41,11 +41,11 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, String> {
         }
       }
 
-      let mut value = c.to_digit(base).unwrap();
+      let mut value: i64 = c.to_digit(base).unwrap() as i64;
 
       while let Some(p) = iter.take_while_ref(|x| x.is_alphanumeric()).next() {
-        value *= base;
-        value += p.to_digit(base).unwrap();
+        value *= base as i64;
+        value += p.to_digit(base).unwrap() as i64;
       }
 
       tokens.push(Token::Integer(value));

@@ -17,7 +17,7 @@ pub enum Expr {
   Div(Box<Expr>, Box<Expr>),
   Assign(Box<Expr>, Box<Expr>),
   Ident(String),
-  Number(u32),
+  Number(i64),
 }
 
 macro_rules! generate_binop {

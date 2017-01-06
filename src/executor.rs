@@ -11,7 +11,7 @@ use context::*;
 
 #[derive(Debug, Clone, Copy)]
 pub enum Value {
-  Number(u32),
+  Number(i64),
 }
 
 impl fmt::Display for Value {
