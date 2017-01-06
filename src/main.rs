@@ -6,6 +6,8 @@
 
 extern crate getopts;
 extern crate itertools;
+#[macro_use]
+extern crate lazy_static;
 
 use getopts::Options;
 use std::env;
@@ -14,6 +16,7 @@ use std::io::{self, Write, BufRead};
 mod lexer;
 mod parser;
 mod executor;
+mod context;
 
 fn print_usage(program: &str, opts: Options)
 {
@@ -42,6 +45,8 @@ fn main() {
   let stdio = io::stdin();
   let mut input = String::new();
 
+  let mut ctx = context::Context::new();
+
   loop {
     print!("=> ");
     io::stdout().flush().ok().expect("Could not flush stdout");
@@ -57,7 +62,7 @@ fn main() {
     let ast = parser::parse(&tokens);
     println!("the AST made from the tokens: {:?}", ast);
 
-    let result = executor::execute(&ast.ok().unwrap());
+    let result = executor::execute(&mut ctx, &ast.ok().unwrap());
     println!("the actual result: {:?}", result);
 
     match result {

@@ -6,3 +6,4 @@ authors = ["Szymon Urbaś <szymon.urbas@aol.com>"]
 [dependencies]
 getopts = "0.2"
 itertools = "0.5.4"
+lazy_static = "0.2.2"

@@ -5,9 +5,11 @@
 //
 
 use std::fmt;
-use parser::*;
 
-#[derive(Debug)]
+use parser::*;
+use context::*;
+
+#[derive(Debug, Clone, Copy)]
 pub enum Value {
   Number(u32),
 }
@@ -48,19 +50,20 @@ impl fmt::LowerHex for Value {
   }
 }
 
-pub fn execute(expr: &Expr) -> Result<Value, &'static str> {
+pub fn execute(ctx: &mut Context, expr: &Expr) -> Result<Value, String> {
   match expr {
     &Expr::Number(i) => {
       Ok(Value::Number(i))
     },
-    &Expr::Ident(ref i) => {
-      println!("TODO: lookup the value of variable '{}'", i);
-
-      Ok(Value::Number(132))
+    &Expr::Ident(ref varname) => {
+      match ctx.lookup_variable(varname.clone()) {
+        Some(value) => Ok(value),
+        None => Err(format!("Variable '{}' not found!", varname)),
+      }
     },
     &Expr::Add(ref l, ref r) => {
-      let lhs = execute(&*l).ok().unwrap();
-      let rhs = execute(&*r).ok().unwrap();
+      let lhs = try!(execute(ctx, &*l));
+      let rhs = try!(execute(ctx, &*r));
 
       match (lhs, rhs) {
         (Value::Number(lhs), Value::Number(rhs)) => {
@@ -69,8 +72,8 @@ pub fn execute(expr: &Expr) -> Result<Value, &'static str> {
       }
     },
     &Expr::Sub(ref l, ref r) => {
-      let lhs = execute(&*l).ok().unwrap();
-      let rhs = execute(&*r).ok().unwrap();
+      let lhs = try!(execute(ctx, &*l));
+      let rhs = try!(execute(ctx, &*r));
 
       match (lhs, rhs) {
         (Value::Number(lhs), Value::Number(rhs)) => {
@@ -79,8 +82,8 @@ pub fn execute(expr: &Expr) -> Result<Value, &'static str> {
       }
     },
     &Expr::Mul(ref l, ref r) => {
-      let lhs = execute(&*l).ok().unwrap();
-      let rhs = execute(&*r).ok().unwrap();
+      let lhs = try!(execute(ctx, &*l));
+      let rhs = try!(execute(ctx, &*r));
 
       match (lhs, rhs) {
         (Value::Number(lhs), Value::Number(rhs)) => {
@@ -89,13 +92,13 @@ pub fn execute(expr: &Expr) -> Result<Value, &'static str> {
       }
     },
     &Expr::Div(ref l, ref r) => {
-      let lhs = execute(&*l).ok().unwrap();
-      let rhs = execute(&*r).ok().unwrap();
+      let lhs = try!(execute(ctx, &*l));
+      let rhs = try!(execute(ctx, &*r));
 
       match (lhs, rhs) {
         (Value::Number(lhs), Value::Number(rhs)) => {
           if rhs == 0 {
-            return Err("Division by zero!");
+            return Err(String::from("Division by zero!"));
           }
 
           Ok(Value::Number(lhs / rhs))
@@ -103,18 +106,19 @@ pub fn execute(expr: &Expr) -> Result<Value, &'static str> {
       }
     },
     &Expr::Assign(ref l, ref r) => {
-      let rhs = execute(&*r).ok().unwrap();
+      let rhs = try!(execute(ctx, &*r));
       let ref lhs = **l;
 
       let varname = match lhs {
         &Expr::Ident(ref varname) => varname.clone(),
-        _ => return Err("Can only assign to an identifier!"),
+        _ => return Err(String::from("Can only assign to an identifier!")),
       };
 
       match rhs {
-        Value::Number(rhs) => {
-          println!("TODO: actually store the value in '{}'", varname);
-          Ok(Value::Number(rhs))
+        Value::Number(value) => {
+          ctx.add_variable(varname, rhs);
+
+          Ok(Value::Number(value))
         }
       }
     },
