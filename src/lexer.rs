@@ -17,7 +17,7 @@ pub enum Token {
   Eq,
 }
 
-pub fn tokenize(input: &str) -> Vec<Token> {
+pub fn tokenize(input: &str) -> Result<Vec<Token>, String> {
   let mut tokens = Vec::new();
 
   let mut iter = input.chars().peekable();
@@ -70,11 +70,11 @@ pub fn tokenize(input: &str) -> Vec<Token> {
       '*' => tokens.push(Token::Star),
       '/' => tokens.push(Token::Slash),
       '=' => tokens.push(Token::Eq),
-      _ => (),
+      ch  => return Err(format!("Unknown character '{}'", ch)),
     }
   }
 
-  return tokens;
+  return Ok(tokens);
 }
 
 /*

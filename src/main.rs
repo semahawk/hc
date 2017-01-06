@@ -57,7 +57,11 @@ fn main() {
       Ok(_) => (),
     }
 
-    let tokens = lexer::tokenize(&input);
+    let tokens = match lexer::tokenize(&input) {
+      Ok(tokens) => tokens,
+      Err(err) => { println!("error: {}", err); continue },
+    };
+
     println!("your tokenized input: {:?}", tokens);
 
     let ast = parser::parse(&tokens);
