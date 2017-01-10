@@ -6,8 +6,6 @@
 
 extern crate getopts;
 extern crate itertools;
-#[macro_use]
-extern crate lazy_static;
 
 use getopts::Options;
 use std::env;
