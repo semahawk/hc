@@ -22,6 +22,8 @@ pub enum Token {
   DoubleLt,
   Gt,
   DoubleGt,
+  Dot,
+  Apostrophe,
 }
 
 pub fn tokenize(input: &str) -> Result<Vec<Token>, String> {
@@ -43,7 +45,14 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, String> {
           Some(&'c') => { iter.next(); base =  8 },
           Some(&'q') => { iter.next(); base =  4 },
           Some(&'b') => { iter.next(); base =  2 },
-          Some(&_) =>   { iter.next(); base = 10 },
+          Some(&c) => {
+            if c.is_numeric() {
+              iter.next(); base = 10;
+            } else {
+              tokens.push(Token::Integer(0));
+              continue;
+            }
+          },
           None => (),
         }
       }
@@ -80,6 +89,8 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, String> {
       '&' => tokens.push(Token::And),
       '|' => tokens.push(Token::Pipe),
       '^' => tokens.push(Token::Caret),
+      '.' => tokens.push(Token::Dot),
+      '\'' => tokens.push(Token::Apostrophe),
       '<' => {
         match iter.peek() {
           Some(&'<') => { iter.next(); tokens.push(Token::DoubleLt); },

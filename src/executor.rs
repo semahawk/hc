@@ -155,6 +155,26 @@ pub fn execute(ctx: &mut Context, expr: &Expr) -> Result<Value, String> {
         }
       }
     },
+    &Expr::BitwiseSetBit(ref l, ref r) => {
+      let lhs = try!(execute(ctx, &*l));
+      let rhs = try!(execute(ctx, &*r));
+
+      match (lhs, rhs) {
+        (Value::Number(lhs), Value::Number(rhs)) => {
+          Ok(Value::Number(lhs | (1 << rhs)))
+        }
+      }
+    },
+    &Expr::BitwiseUnsetBit(ref l, ref r) => {
+      let lhs = try!(execute(ctx, &*l));
+      let rhs = try!(execute(ctx, &*r));
+
+      match (lhs, rhs) {
+        (Value::Number(lhs), Value::Number(rhs)) => {
+          Ok(Value::Number(lhs & !(1 << rhs)))
+        }
+      }
+    },
     &Expr::Assign(ref l, ref r) => {
       let rhs = try!(execute(ctx, &*r));
       let ref lhs = **l;
