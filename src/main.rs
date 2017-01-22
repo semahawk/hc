@@ -6,10 +6,13 @@
 
 extern crate getopts;
 extern crate itertools;
+extern crate rustyline;
 
 use getopts::Options;
 use std::env;
-use std::io::{self, Write, BufRead};
+
+use rustyline::error::ReadlineError;
+use rustyline::Editor;
 
 mod lexer;
 mod parser;
@@ -40,24 +43,30 @@ fn main() {
     return;
   }
 
-  let stdio = io::stdin();
-  let mut input = String::new();
+  let mut rl = Editor::<()>::new();
 
   let mut current_result = 0i64;
   let mut ctx = context::Context::new();
 
   loop {
-    print!("=> ");
-    io::stdout().flush().ok().expect("Could not flush stdout");
+    let readline = rl.readline(">> ");
 
-    match stdio.lock().read_line(&mut input) {
-      Err(err) => {
-        println!("# error: {}", err);
-        input.clear();
-        continue
+    let mut input = match readline {
+      Ok(input) => {
+        rl.add_history_entry(&input);
+        input
       },
-      Ok(_) => (),
-    }
+      Err(ReadlineError::Interrupted) => {
+        break
+      },
+      Err(ReadlineError::Eof) => {
+        break
+      }
+      Err(err) => {
+        println!("error: {:?}", err);
+        break
+      }
+    };
 
     let tokens = match lexer::tokenize(&input) {
       Ok(tokens) => tokens,
