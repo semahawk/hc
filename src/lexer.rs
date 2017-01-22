@@ -47,7 +47,7 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, String> {
           Some(&'b') => { iter.next(); base =  2 },
           Some(&c) => {
             if c.is_numeric() {
-              iter.next(); base = 10;
+              base = 10;
             } else {
               tokens.push(Token::Integer(0));
               continue;
