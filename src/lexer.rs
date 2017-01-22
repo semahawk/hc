@@ -24,6 +24,8 @@ pub enum Token {
   DoubleGt,
   Dot,
   Apostrophe,
+  LeftParen,
+  RightParen,
 }
 
 pub fn tokenize(input: &str) -> Result<Vec<Token>, String> {
@@ -91,6 +93,8 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, String> {
       '^' => tokens.push(Token::Caret),
       '.' => tokens.push(Token::Dot),
       '\'' => tokens.push(Token::Apostrophe),
+      '(' => tokens.push(Token::LeftParen),
+      ')' => tokens.push(Token::RightParen),
       '<' => {
         match iter.peek() {
           Some(&'<') => { iter.next(); tokens.push(Token::DoubleLt); },

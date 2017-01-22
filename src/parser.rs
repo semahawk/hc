@@ -74,7 +74,7 @@ fn primary(tokens: &mut Peekable<Iter<Token>>) -> Option<Expr> {
     let token = tokens.peek().unwrap();
 
     match token {
-      &&Token::Integer(_) | &&Token::Ident(_) => (),
+      &&Token::Integer(_) | &&Token::Ident(_) | &&Token::LeftParen => (),
       _ => return None,
     };
   }
@@ -84,6 +84,20 @@ fn primary(tokens: &mut Peekable<Iter<Token>>) -> Option<Expr> {
   match token {
     &Token::Integer(i) => Some(Expr::Number(i)),
     &Token::Ident(ref i) => Some(Expr::Ident(i.clone())),
+    &Token::LeftParen => {
+      let expr = match expr(tokens) {
+        Some(expr) => expr,
+        None => return None,
+      };
+
+      match tokens.next() {
+        Some(token) => match token {
+          &Token::RightParen => Some(expr),
+          _ => None,
+        },
+        None => None,
+      }
+    },
     _ => None,
   }
 }
