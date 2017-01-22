@@ -2,6 +2,10 @@
 name = "hc"
 version = "0.1.0"
 authors = ["Szymon Urbaś <szymon.urbas@aol.com>"]
+license = "BSD-2-Clause"
+description = "Handy calculator for haxor calculations"
+repository = "https://github.com/semahawk/hc"
+readme = "README.md"
 
 [dependencies]
 getopts = "0.2"
