@@ -18,6 +18,8 @@ pub enum Expr {
   BitwiseAnd(Box<Expr>, Box<Expr>),
   BitwiseXor(Box<Expr>, Box<Expr>),
   BitwiseOr(Box<Expr>, Box<Expr>),
+  BitwiseShl(Box<Expr>, Box<Expr>),
+  BitwiseShr(Box<Expr>, Box<Expr>),
   Assign(Box<Expr>, Box<Expr>),
   Ident(String),
   Number(i64),
@@ -86,7 +88,8 @@ fn primary(tokens: &mut Peekable<Iter<Token>>) -> Option<Expr> {
 
 generate_binop!(primary before mul, Star -> Mul, Slash -> Div);
 generate_binop!(mul before add, Plus -> Add, Minus -> Sub);
-generate_binop!(add before bitwise_and, And -> BitwiseAnd);
+generate_binop!(add before bitwise_shift, And -> BitwiseAnd);
+generate_binop!(bitwise_shift before bitwise_and, DoubleLt -> BitwiseShl, DoubleGt -> BitwiseShr);
 generate_binop!(bitwise_and before bitwise_xor, Caret -> BitwiseXor);
 generate_binop!(bitwise_xor before bitwise_or, Pipe -> BitwiseOr);
 generate_binop!(bitwise_or before assign, Eq -> Assign);

@@ -18,6 +18,10 @@ pub enum Token {
   And,
   Pipe,
   Caret,
+  Lt,
+  DoubleLt,
+  Gt,
+  DoubleGt,
 }
 
 pub fn tokenize(input: &str) -> Result<Vec<Token>, String> {
@@ -76,6 +80,18 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, String> {
       '&' => tokens.push(Token::And),
       '|' => tokens.push(Token::Pipe),
       '^' => tokens.push(Token::Caret),
+      '<' => {
+        match iter.peek() {
+          Some(&'<') => { iter.next(); tokens.push(Token::DoubleLt); },
+          _ => tokens.push(Token::Lt),
+        }
+      },
+      '>' => {
+        match iter.peek() {
+          Some(&'>') => { iter.next(); tokens.push(Token::DoubleGt); },
+          _ => tokens.push(Token::Gt),
+        }
+      },
       ch  => return Err(format!("Unknown character '{}'", ch)),
     }
   }
