@@ -19,6 +19,8 @@ mod parser;
 mod executor;
 mod context;
 
+const LOG_10_2: f64 = 0.301029995663981195213738894724493026768189881462108541310;
+
 fn print_usage(program: &str, opts: Options)
 {
   let brief = format!("Usage: {} [options]", program);
@@ -89,7 +91,19 @@ fn main() {
     match executor::execute(&mut ctx, &ast) {
       Ok(result) => {
         let res_name = format!("res{}", current_result);
-        println!("{} = {} (hex: {:x} oct: {:o} bin: {:b})", res_name, result, result, result, result);
+
+        match result {
+          executor::Value::Number(result) => {
+            let zero_pad_bits = 32;
+
+            println!("{} = {:0d_width$} (hex: {:0x_width$x} bin: {:0b_width$b})",
+              res_name, result, result, result,
+              d_width = (LOG_10_2 * (zero_pad_bits as f64)).ceil() as usize,
+              x_width = zero_pad_bits / 4,
+              b_width = zero_pad_bits);
+          }
+        }
+
         ctx.add_variable(res_name, result);
         current_result += 1;
       },
