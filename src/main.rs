@@ -93,23 +93,18 @@ fn main() {
     match executor::execute(&mut ctx, &ast) {
       Ok(result) => {
         let res_name = format!("res{}", current_result);
+        let zero_pad_bits = match ctx.lookup_variable(String::from("zeropad")) {
+          Some(zeropad) => match zeropad {
+            executor::Value::Number(zeropad) => zeropad,
+          },
+          None => 32,
+        };
 
-        match result {
-          executor::Value::Number(result) => {
-            let zero_pad_bits = match ctx.lookup_variable(String::from("zeropad")) {
-              Some(zeropad) => match zeropad {
-                executor::Value::Number(zeropad) => zeropad,
-              },
-              None => 32,
-            };
-
-            println!("{} = {:0d_width$} (hex: {:0x_width$x} bin: {:0b_width$b})",
-              res_name, result, result, result,
-              d_width = (LOG_10_2 * (zero_pad_bits as f64)).ceil() as usize,
-              x_width = (zero_pad_bits as usize) / 4,
-              b_width = (zero_pad_bits as usize));
-          }
-        }
+        println!("{} = {:0d_width$} (hex: {:0x_width$x} bin: {:0b_width$b}; {})",
+          res_name, result, result, result, result.to_nice_unit(),
+          d_width = (LOG_10_2 * (zero_pad_bits as f64)).ceil() as usize,
+          x_width = (zero_pad_bits as usize) / 4,
+          b_width = (zero_pad_bits as usize));
 
         ctx.add_variable(res_name, result);
         current_result += 1;

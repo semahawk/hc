@@ -14,11 +14,36 @@ pub enum Value {
   Number(i64),
 }
 
-impl fmt::Display for Value {
-  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+impl Value {
+  pub fn to_nice_unit(&self) -> String {
+    let mut units = vec!["EiB", "PiB", "TiB", "GiB", "MiB", "KiB", "B"];
+    let mut final_unit = units.pop().unwrap();
 
     match self {
-      &Value::Number(n) => write!(f, "{}", n),
+      &Value::Number(orig_value) => {
+        let mut value = orig_value as f64;
+        'a: while value >= 1024f64 {
+          if let Some(unit) = units.pop() {
+            final_unit = unit;
+            value /= 1024f64;
+          } else {
+            break 'a;
+          }
+        }
+
+        return format!("{} {}", value, final_unit);
+      },
+    }
+  }
+}
+
+impl fmt::Display for Value {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    match self {
+      &Value::Number(n) => {
+        let width = f.width().unwrap_or(0);
+        write!(f, "{:width$}", n, width = width)
+      },
     }
   }
 }
