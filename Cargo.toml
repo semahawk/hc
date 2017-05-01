@@ -1,6 +1,6 @@
 [package]
 name = "hc"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Szymon Urbaś <szymon.urbas@aol.com>"]
 license = "BSD-2-Clause"
 description = "Handy calculator for haxor calculations"
