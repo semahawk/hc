@@ -100,11 +100,12 @@ fn main() {
           None => 32,
         };
 
-        println!("{} = {:0d_width$} (hex: {:0x_width$x} bin: {:0b_width$b}; {})",
-          res_name, result, result, result, result.to_nice_unit(),
-          d_width = (LOG_10_2 * (zero_pad_bits as f64)).ceil() as usize,
-          x_width = (zero_pad_bits as usize) / 4,
-          b_width = (zero_pad_bits as usize));
+        println!("in base  2: {:0b_width$b}", result, b_width = (zero_pad_bits as usize));
+        println!("in base 10: {:0d_width$}",  result, d_width = (LOG_10_2 * (zero_pad_bits as f64)).ceil() as usize);
+        println!("in base 16: {:0x_width$x}", result, x_width = (zero_pad_bits as usize) / 4);
+        println!("bits set: {:?}", result.bits_set());
+        println!("as nice size: {}", result.to_nice_unit());
+        println!("saved as variable: {}", res_name);
 
         ctx.add_variable(res_name, result);
         current_result += 1;

@@ -15,6 +15,22 @@ pub enum Value {
 }
 
 impl Value {
+  pub fn bits_set(&self) -> Vec<u32> {
+    let mut bits = vec![];
+
+    match self {
+      &Value::Number(v) => {
+        for bit in 0..64 {
+          if (v & (1 << bit)) != 0 {
+            bits.push(bit);
+          }
+        }
+      },
+    }
+
+    return bits;
+  }
+
   pub fn to_nice_unit(&self) -> String {
     let mut units = vec!["EiB", "PiB", "TiB", "GiB", "MiB", "KiB", "B"];
     let mut final_unit = units.pop().unwrap();
@@ -42,7 +58,7 @@ impl fmt::Display for Value {
     match self {
       &Value::Number(n) => {
         let width = f.width().unwrap_or(0);
-        write!(f, "{:width$}", n, width = width)
+        write!(f, "{:0width$}", n, width = width)
       },
     }
   }
@@ -52,7 +68,10 @@ impl fmt::Binary for Value {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 
     match self {
-      &Value::Number(n) => write!(f, "{:b}", n),
+      &Value::Number(n) => {
+        let width = f.width().unwrap_or(0);
+        write!(f, "{:0width$b}", n, width = width)
+      },
     }
   }
 }
@@ -61,7 +80,10 @@ impl fmt::Octal for Value {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 
     match self {
-      &Value::Number(n) => write!(f, "{:o}", n),
+      &Value::Number(n) => {
+        let width = f.width().unwrap_or(0);
+        write!(f, "{:0width$o}", n, width = width)
+      }
     }
   }
 }
@@ -70,7 +92,10 @@ impl fmt::LowerHex for Value {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 
     match self {
-      &Value::Number(n) => write!(f, "{:x}", n),
+      &Value::Number(n) => {
+        let width = f.width().unwrap_or(0);
+        write!(f, "{:0width$x}", n, width = width)
+      }
     }
   }
 }
