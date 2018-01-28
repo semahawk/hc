@@ -61,9 +61,19 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, String> {
 
       let mut value: i64 = c.to_digit(base).unwrap() as i64;
 
-      while let Some(p) = iter.take_while_ref(|x| x.is_alphanumeric()).next() {
+      while let Some(p) = iter.take_while_ref(|x| x.is_digit(base)).next() {
         value *= base as i64;
         value += p.to_digit(base).unwrap() as i64;
+      }
+
+      match iter.peek() {
+        Some(&'K') | Some(&'k') => { iter.next(); value *= 1024 },
+        Some(&'M') | Some(&'m') => { iter.next(); value *= 1024 * 1024 },
+        Some(&'G') | Some(&'g') => { iter.next(); value *= 1024 * 1024 * 1024 },
+        Some(&'T') | Some(&'t') => { iter.next(); value *= 1024 * 1024 * 1024 * 1024 },
+        Some(&'P') | Some(&'p') => { iter.next(); value *= 1024 * 1024 * 1024 * 1024 * 1024 },
+        Some(&'E') | Some(&'e') => { iter.next(); value *= 1024 * 1024 * 1024 * 1024 * 1024 * 1024 },
+        Some(&_) | None => (),
       }
 
       tokens.push(Token::Integer(value));
